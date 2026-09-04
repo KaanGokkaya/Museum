@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aşk Müzesi - İçerisi</title>
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: 'Georgia', serif; 
+        overflow: hidden;
+        background-color: #000; 
+        user-select: none;
+        -webkit-user-select: none;
+    }
+
+    /* Sahnelerin Genel Ayarı */
+    .scene {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        transition: opacity 1.2s ease-in-out; 
+    }
+
+    /* 1. Sahne: Dış Mekan */
+    #scene-exterior {
+        background-image: url('muze.jpg');
+        z-index: 7; 
+        display: flex;
+        justify-content: center;
+        align-items: flex-end; 
+        padding-bottom: 10vh;
+        box-sizing: border-box;
+    }
+
+    /* 2. Sahne: İç Mekan (Koridorlar) */
+    #scene-interior {
+        background-image: url('muzegiris.jpg');
+        z-index: 6; 
+        opacity: 0; 
+        pointer-events: none;
+    }
+
+    /* 3. Sahne: Fotoğraf Galerisi 1 */
+    #scene-photos { z-index: 5; opacity: 0; pointer-events: none; display: flex; justify-content: center; align-items: center; background-color: #1a1a1a; }
+    /* 4. Sahne: Fotoğraf Galerisi 2 */
+    #scene-photos-2 { z-index: 4; opacity: 0; pointer-events: none; display: flex; justify-content: center; align-items: center; background-color: #1a1a1a; }
+    /* 5. Sahne: Hobiler 1 */
+    #scene-hobbies { z-index: 3; opacity: 0; pointer-events: none; display: flex; justify-content: center; align-items: center; background-color: #1a1a1a; }
+    /* 6. Sahne: Hobiler 2 */
+    #scene-hobbies-2 { z-index: 2; opacity: 0; pointer-events: none; display: flex; justify-content: center; align-items: center; background-color: #1a1a1a; }
+    
+    /* 7. Sahne: Çıkış Odası */
+    #scene-exit {
+        z-index: 1;
+        opacity: 0;
+        pointer-events: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #1a1a1a; 
+    }
+    
+    /* 8. Sahne: Final */
+    #scene-final {
+        z-index: 0;
+        opacity: 0;
+        pointer-events: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #000; 
+    }
+
+    /* Ekran oranını koruyan iç kapsayıcılar */
+    .gallery-container, .gallery-container-2, .gallery-container-hobbies, .gallery-container-hobbies-2, .gallery-container-exit, .gallery-container-final {
+        position: relative;
+        width: 100vw;
+        height: 56.25vw; 
+        background-size: cover;
+        background-position: center;
+        box-shadow: 0 0 50px rgba(0,0,0,0.8);
+    }
+
+    .gallery-container { background-image: url('fotograf1.jpg'); }
+    .gallery-container-2 { background-image: url('forograf2.jpg'); }
+    .gallery-container-hobbies { background-image: url('hobi1.jpg'); } 
+    .gallery-container-hobbies-2 { background-image: url('hobi2.jpg'); }
+    .gallery-container-exit { background-image: url('cıkıs.jpg'); }
+    .gallery-container-final { background-image: url('final.jpg'); }
+
+    /* Geniş ekranlarda oran bozulmasın diye */
+    @media (min-aspect-ratio: 16/9) {
+        .gallery-container, .gallery-container-2, .gallery-container-hobbies, .gallery-container-hobbies-2, .gallery-container-exit, .gallery-container-final {
+            width: 177.78vh; 
+            height: 100vh;
+        }
+    }
+
+    /* Geçiş Animasyonu Sınıfları */
+    .fade-out { opacity: 0 !important; pointer-events: none !important; }
+    .fade-in { opacity: 1 !important; pointer-events: auto !important; }
+
+    /* Genel Buton Tasarımı */
+    .museum-btn {
+        padding: 16px 55px;
+        font-size: 22px;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        font-weight: bold;
+        color: #2c251d; 
+        background-color: rgba(212, 196, 168, 0.92); 
+        border: 2px solid #2c251d;
+        border-radius: 4px; 
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(2px); 
+    }
+
+    .museum-btn:hover { background-color: rgba(194, 176, 141, 1); color: #1a1611; transform: translateY(-4px); box-shadow: 0 15px 25px rgba(0, 0, 0, 0.5); }
+    .museum-btn:active { transform: translateY(1px); background-color: rgba(175, 160, 124, 1); box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4); }
+
+    /* Koridordaki "GEZ" Butonları */
+    .gez-btn { position: absolute; padding: 10px 30px; font-size: 15px; letter-spacing: 3px; transform: translate(-50%, -50%); }
+    .gez-btn:hover { transform: translate(-50%, calc(-50% - 4px)) !important; }
+    .gez-btn:active { transform: translate(-50%, calc(-50% + 1px)) !important; }
+
+    /* Kapı Koordinatları */
+    .btn-left { top: 55%; left: 21%; }
+    .btn-center { top: 55%; left: 50%; }
+    .btn-right { top: 55%; left: 79%; }
+
+    /* Küçük OKU Butonları */
+    .oku-btn { position: absolute; padding: 6px 18px; font-size: 12px; letter-spacing: 2px; transform: translate(-50%, -50%); }
+    .oku-btn:hover { transform: translate(-50%, calc(-50% - 3px)) !important; }
+    .oku-btn:active { transform: translate(-50%, calc(-50% + 1px)) !important; }
+
+    /* OKU Butonu Koordinatları */
+    .btn-oku-1 { top: 76.5%; left: 18.5%; } .btn-oku-2 { top: 76.5%; left: 43.3%; }
+    .btn-oku-3 { top: 76.5%; left: 64.7%; } .btn-oku-4 { top: 76.5%; left: 86.2%; }
+    .btn-oku-hobi-1 { top: 78%; left: 16%; } .btn-oku-hobi-2 { top: 78%; left: 39%; }
+    .btn-oku-hobi-3 { top: 78%; left: 61%; } .btn-oku-hobi-4 { top: 78%; left: 84%; }
+    .btn-oku-hobi2-1 { top: 80%; left: 15.5%; } .btn-oku-hobi2-2 { top: 83%; left: 50%; } 
+    .btn-oku-hobi2-3 { top: 80%; left: 84.5%; }
+
+    /* Çıkış Odası Mektup OKU ve Kapı ÇIK Butonları */
+    .btn-oku-exit { top: 62%; left: 50%; }
+    .btn-final-exit { 
+        position: absolute; 
+        top: 43%; left: 50%; 
+        transform: translate(-50%, -50%); 
+        opacity: 0; 
+        pointer-events: none; 
+        transition: opacity 1.5s ease; 
+        padding: 10px 40px;
+        font-size: 18px;
+    }
+    .btn-final-exit:hover { transform: translate(-50%, calc(-50% - 4px)) !important; }
+    .btn-final-exit:active { transform: translate(-50%, calc(-50% + 1px)) !important; }
+
+    /* OK (NAVİGASYON) BUTONLARI */
+    .arrow-btn { position: absolute; top: 50%; transform: translateY(-50%); padding: 15px 25px; font-size: 26px; z-index: 10; }
+    .arrow-btn:hover { transform: translateY(calc(-50% - 4px)) !important; }
+    .arrow-btn:active { transform: translateY(calc(-50% + 1px)) !important; }
+    .arrow-left { left: 3%; } .arrow-right { right: 3%; }
+
+    /* ANA EKRANA GERİ DÖN BUTONU */
+    .back-to-exterior-btn {
+        position: absolute; bottom: 5%; left: 50%; transform: translateX(-50%);
+        padding: 10px 25px; font-size: 14px; letter-spacing: 3px; z-index: 10;
+    }
+    .back-to-exterior-btn:hover { transform: translate(-50%, -4px) !important; }
+    .back-to-exterior-btn:active { transform: translate(-50%, 1px) !important; }
+    
+    /* Sol Alt Köşe Geri Butonu (Final Ekranı İçin) */
+    .back-to-exit-btn {
+        position: absolute; bottom: 5%; left: 3%;
+        padding: 10px 25px; font-size: 14px; letter-spacing: 3px; z-index: 10;
+    }
+    .back-to-exit-btn:hover { transform: translateY(-4px) !important; }
+    .back-to-exit-btn:active { transform: translateY(1px) !important; }
+
+    /* ==================================================
+       BÜYÜYEREK GELEN KAĞIT EKRANI
+       ================================================== */
+    .paper-modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);
+        display: flex; justify-content: center; align-items: center;
+        opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
+        z-index: 100; perspective: 1200px;
+    }
+
+    .paper-modal-overlay.active { opacity: 1; pointer-events: all; }
+
+    .big-paper {
+        width: 650px; height: 400px; /* Standart Yatay */
+        background: linear-gradient(135deg, #f0e4ce, #dfcdab);
+        border-radius: 6px;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.6), inset 0 0 20px rgba(139, 115, 85, 0.1);
+        transform: scale(0.5) rotateX(0deg) rotateY(0deg);
+        opacity: 0; transform-style: preserve-3d;
+        transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease, width 0.4s, height 0.4s;
+        cursor: grab; display: flex; flex-direction: column; justify-content: center;
+        align-items: center; padding: 40px 60px; box-sizing: border-box;
+    }
+
+    /* DİKEY KAĞIT MODU (Mektup için) */
+    .big-paper.vertical {
+        width: 450px;
+        height: 600px;
+        padding: 60px 40px;
+    }
+
+    .paper-modal-overlay.active .big-paper { transform: scale(1) rotateX(0deg) rotateY(0deg); opacity: 1; }
+    .big-paper:active { cursor: grabbing; }
+
+    .big-paper-content { transform: translateZ(20px); text-align: center; font-style: italic; }
+    .big-paper-content h2 { font-family: Georgia, serif; color: #5c3a21; font-size: 26px; margin-bottom: 20px; line-height: 1.3; }
+    .big-paper-content p { font-family: Georgia, serif; font-size: 18px; color: #33271a; line-height: 1.8; margin: 0; }
+    .location-text { font-family: Georgia, serif; font-size: 14px; color: #6d5b4a; opacity: 0.7; margin-top: 25px !important; font-style: italic; }
+
+</style>
+</head>
+<body>
+
+    <div class="paper-modal-overlay" id="paperModalOverlay">
+        <div class="big-paper" id="bigPaper">
+            <div class="big-paper-content">
+                <h2 id="modalTitle">Başlık</h2>
+                <p id="modalText">İçerik buraya gelecek.</p>
+                <p id="modalLocation" class="location-text"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="scene-final" class="scene">
+        <div class="gallery-container-final">
+            <button id="btn-back-to-exit-from-final" class="museum-btn back-to-exit-btn">&#10094; GERİ</button>
+        </div>
+    </div>
+
+    <div id="scene-exit" class="scene">
+        <div class="gallery-container-exit">
+            
+            <button id="btn-final-exit" class="museum-btn btn-final-exit">ÇIK</button>
+
+            <button class="museum-btn oku-btn btn-oku-exit" id="btn-oku-exit" 
+                    data-title="Sevgilimm," 
+                    data-text="Hayatımın en güzel 5 ayını bana yaşattığın için teşekkür ederim. Seni çok seviyorum. İnşallah nice aylar yıllar saymak nasip olur. Ben her zaman senin yanında olucam. Sen benim en yakın arkadaşım, dostum, sevgilim, ailemsin. Bu sefer yanında olamasam da böyle bir fikir buldum. Umarım hoşuna gitmiştir." 
+                    data-location="Son ufak bir sürprizim daha var" 
+                    data-layout="vertical">OKU</button>
+        </div>
+        
+        <button id="btn-back-to-interior-from-exit" class="museum-btn back-to-exterior-btn">&#10094; GERİ</button>
+    </div>
+
+    <div id="scene-hobbies-2" class="scene">
+        <button id="btn-back-to-hobbies-1" class="museum-btn arrow-btn arrow-left">&#10094;</button>
+
+        <div class="gallery-container-hobbies-2">
+            <button class="museum-btn oku-btn btn-oku-hobi2-1" data-title="İkimizin puzzle'ı" data-text="Son parçayı kaybettiğimizi farkettikten sonra üzülmeni hatırlıyorum. Ben de çok üzülmüştüm. Ama Topkapı'da otururken onu bulduğunda çok mutlu olmuştuk. Bu hediyeni çok seviyorum sürekli bakıyorum. Şimdi ise odamda duruyor. İnşallah evimize asmak da nasip olur." data-location="Şuanki Durum: Benim Odamda Duruyor">OKU</button>
+            <button class="museum-btn oku-btn btn-oku-hobi2-2" data-title="Fotoğrafımız ve Lego Çerçeve" data-text="Bu fotoğrafımızı çok seviyorum. Aldığımız lego çerçeveler de ayrıca çok güzel. Her gece yatmadan önce bu fotoğrafa bakıyorum, her kalktığımda bu fotoğrafa bakarak uyanıyorum" data-location="Şuanki Durum: Yanıbaşımda duruyor">OKU</button>
+            <button class="museum-btn oku-btn btn-oku-hobi2-3" data-title="2000 Parçalık Puzzle" data-text="Bunu aldıktan sonra beraber yaparken kabul etmesek de iyi ilerliyorduk sadece her seferinde toplayıp geri çıkarmak bizi yavaşlatıyordu. Ayrıca orda olmasan da fotoğraftan bile parça bulup yerleştirmeyi başarmıştın. Buna senle başladım senle bitiricem inşallah Aşkım. Senin yerleştirmeni bekleyen 8 adet parça duruyor. Geri kalanları daha bitiremedim ama az kaldı." data-location="Şuanki Durum: Daha bitmiş değil, salonda masa üstünde">OKU</button>
+        </div>
+
+        <button id="btn-back-to-interior-from-hobi-2" class="museum-btn arrow-btn arrow-right">&#10095;</button>
+    </div>
+
+    <div id="scene-hobbies" class="scene">
+        <button id="btn-back-to-interior-from-hobi" class="museum-btn arrow-btn arrow-left">&#10094;</button>
+
+        <div class="gallery-container-hobbies">
+            <button class="museum-btn oku-btn btn-oku-hobi-1" data-title="Mercedes-AMG G 63" data-text="Aşkımın en sevdiği araba bunu yaparken çok eğlenmiştik. Kaputun açılması ve silecekleri olması çok iyi." data-location="Yapılma Yeri: Sütlüce Sahil">OKU</button>
+            <button class="museum-btn oku-btn btn-oku-hobi-2" data-title="Ferrari SF90 XX Stradale" data-text="İlk aldığımız legoydu beraber. Ataköyde göz randevusundan dönerken almıştın bana. O an çok mutlu olmuştum. Yaparken de aşırı keyif almıştık." data-location="Yapılma Yeri: Topkapı Parkı">OKU</button>
+            <button class="museum-btn oku-btn btn-oku-hobi-3" data-title="Nissan Skyline GT-R R34" data-text="Çok istediğim bir arabaydı. Bana hediye aldığını öğrendiğimde aşırı mutlu olmuştum. Uzun süredir istiyordum ama maddi durumlardan dolayı alamamıştık sürekli. Senle o gece oturup sen izlerken yapmak çok güzeldi aşkım." data-location="Yapılma Yeri: İTÜ Ayazağa Konukevi">OKU</button>
+            <button class="museum-btn oku-btn btn-oku-hobi-4" data-title="Mercedes-AMG SL 63" data-text="G kasayla aynı kutunun içindeydi onu aldığımı gördüğünde yüzündeki mutluluk beni çok mutlu etmişti. Yaparken ki heyecanın ve her parçayı taktığında yavaş yavaş oluşan aracı görüp mutlu olman çok özeldi benim için." data-location="Yapılma Yeri: Sütlüce Sahil">OKU</button>
+        </div>
+
+        <button id="btn-to-hobbies-2" class="museum-btn arrow-btn arrow-right">&#10095;</button>
+    </div>
+
+    <div id="scene-photos-2" class="scene">
+        <button id="btn-back-to-photos-1" class="museum-btn arrow-btn arrow-left">&#10094;</button>
+        <div class="gallery-container-2">
+            <button class="museum-btn oku-btn btn-oku-1" data-title="5." data-text="Sultanım, Padişahım, Aşkım, Güzelim, Ömrüm, Nefesim, Sevgilim, Neşem, Mutluluğum" data-location="Konum: Devlet-i Aliyye-i Osmâniyye">OKU</button>
+            <button class="museum-btn oku-btn btn-oku-2" data-title="Ayımız" data-text="Senle kahvaltı yapmayı çok seviyorum. Sanki evimizde beraber yapıyormuşuz gibi hissettiriyor. Ben zaten evimin yanında oluyorum." data-location="Konum: Nişantaşı">OKU</button>
+            <button class="museum-btn oku-btn btn-oku-3" data-title="Kutlu" data-text="Seninle senin doğduğun yaşamış olduğun sokakları gezmeyi, geldiğimi duyduğundaki şaşırmanı ve heyecanını unutamam. Çok uzun süre geçiremesek de yaşadığım en güzel günlerden biriydi" data-location="Konum: Sorgun">OKU</button>
+            <button class="museum-btn oku-btn btn-oku-4" data-title="Olsun" data-text="Çiçeği ilk gördüğündeki heyecanını her hatırladığımda o kadar çok mutlu oluyorum ki. Senin mutluluğun beni çok mutlu ediyor." data-location="Konum: Cevizlibağ Yurt Kapısı">OKU</button>
+        </div>
+        <button id="btn-back-to-interior-from-2" class="museum-btn arrow-btn arrow-right">&#10095;</button>
+    </div>
+
+    <div id="scene-photos" class="scene">
+        <button id="btn-back-to-interior" class="museum-btn arrow-btn arrow-left">&#10094;</button>
+        <div class="gallery-container">
+            <button class="museum-btn oku-btn btn-oku-1" data-title="Aşkım" data-text="Aşkım hala bu günü çok özlüyorum. Her saniyesi o kadar güzeldi ki. Otobüsten indiğimde senin büyüdüğün sokaklarda gezme hissi beni çok heyecanlandırmıştı." data-location="Konum: Manavgat Sorgun Plajı">OKU</button>
+            <button class="museum-btn oku-btn btn-oku-2" data-title="Seni" data-text="Senle beraber yemek yemeyi de çok özledim aşkım. Beraber yemek paylaşmayı özledim." data-location="Konum: Çapa">OKU</button>
+            <button class="museum-btn oku-btn btn-oku-3" data-title="Çok" data-text="Adaların hepsini gezememiştik aşkım, bu sene inşallah hepsine gidip güzelce gezeriz. Dondurmamızı alırız yemeğimizi yeriz" data-location="Konum : Büyükada">OKU</button>
+            <button class="museum-btn oku-btn btn-oku-4" data-title="Seviyorum" data-text="Çekilmemiş olsak da, bizim yaptığımız bir görsel olsa da favori fotoğraflarımızdan biri. Bu fotoğrafı çok seviyorum." data-location="Konum: Kalbim">OKU</button>
+        </div>
+        <button id="btn-to-photos-2" class="museum-btn arrow-btn arrow-right">&#10095;</button>
+    </div>
+
+    <div id="scene-interior" class="scene">
+        <button id="btn-gez-left" class="museum-btn gez-btn btn-left">GEZ</button>
+        <button id="btn-gez-center" class="museum-btn gez-btn btn-center">GEZ</button>
+        <button id="btn-gez-right" class="museum-btn gez-btn btn-right">GEZ</button>
+        <button id="btn-back-to-exterior" class="museum-btn back-to-exterior-btn">&#10094; GERİ</button>
+    </div>
+
+    <div id="scene-exterior" class="scene">
+        <button id="btn-enter" class="museum-btn">GİR</button>
+    </div>
+
+    <script>
+        const btnEnter = document.getElementById('btn-enter');
+        const btnGezLeft = document.getElementById('btn-gez-left');
+        const btnGezCenter = document.getElementById('btn-gez-center'); 
+        const btnGezRight = document.getElementById('btn-gez-right'); 
+        
+        const btnBackToExterior = document.getElementById('btn-back-to-exterior'); 
+        const btnBackToInterior = document.getElementById('btn-back-to-interior'); 
+        
+        const btnToPhotos2 = document.getElementById('btn-to-photos-2'); 
+        const btnBackToPhotos1 = document.getElementById('btn-back-to-photos-1'); 
+        const btnBackToInteriorFrom2 = document.getElementById('btn-back-to-interior-from-2'); 
+        
+        const btnBackToInteriorFromHobi = document.getElementById('btn-back-to-interior-from-hobi'); 
+        const btnToHobbies2 = document.getElementById('btn-to-hobbies-2'); 
+        const btnBackToHobbies1 = document.getElementById('btn-back-to-hobbies-1');
+        const btnBackToInteriorFromHobi2 = document.getElementById('btn-back-to-interior-from-hobi-2');
+        
+        const btnBackToInteriorFromExit = document.getElementById('btn-back-to-interior-from-exit');
+        const btnFinalExit = document.getElementById('btn-final-exit');
+        const btnBackToExitFromFinal = document.getElementById('btn-back-to-exit-from-final');
+        const btnOkuExit = document.getElementById('btn-oku-exit');
+
+        const sceneExterior = document.getElementById('scene-exterior');
+        const sceneInterior = document.getElementById('scene-interior');
+        const scenePhotos = document.getElementById('scene-photos');
+        const scenePhotos2 = document.getElementById('scene-photos-2');
+        const sceneHobbies = document.getElementById('scene-hobbies'); 
+        const sceneHobbies2 = document.getElementById('scene-hobbies-2'); 
+        const sceneExit = document.getElementById('scene-exit'); 
+        const sceneFinal = document.getElementById('scene-final'); 
+
+        // Sahneler Arası Geçişler
+        
+        btnEnter.addEventListener('click', () => {
+            sceneExterior.classList.remove('fade-in');
+            sceneInterior.classList.remove('fade-out');
+            sceneExterior.classList.add('fade-out');
+            sceneInterior.classList.add('fade-in');
+        });
+
+        btnBackToExterior.addEventListener('click', () => {
+            sceneInterior.classList.remove('fade-in');
+            sceneExterior.classList.remove('fade-out');
+            sceneInterior.classList.add('fade-out');
+            sceneExterior.classList.add('fade-in');
+        });
+
+        btnGezLeft.addEventListener('click', () => {
+            sceneInterior.classList.remove('fade-in'); 
+            scenePhotos.classList.remove('fade-out');
+            sceneInterior.classList.add('fade-out');
+            scenePhotos.classList.add('fade-in');
+        });
+
+        btnBackToInterior.addEventListener('click', () => {
+            scenePhotos.classList.remove('fade-in');
+            sceneInterior.classList.remove('fade-out');
+            scenePhotos.classList.add('fade-out');
+            sceneInterior.classList.add('fade-in');
+        });
+
+        btnToPhotos2.addEventListener('click', () => {
+            scenePhotos.classList.remove('fade-in');
+            scenePhotos2.classList.remove('fade-out');
+            scenePhotos.classList.add('fade-out');
+            scenePhotos2.classList.add('fade-in');
+        });
+
+        btnBackToPhotos1.addEventListener('click', () => {
+            scenePhotos2.classList.remove('fade-in');
+            scenePhotos.classList.remove('fade-out');
+            scenePhotos2.classList.add('fade-out');
+            scenePhotos.classList.add('fade-in');
+        });
+
+        btnBackToInteriorFrom2.addEventListener('click', () => {
+            scenePhotos2.classList.remove('fade-in');
+            sceneInterior.classList.remove('fade-out');
+            scenePhotos2.classList.add('fade-out');
+            sceneInterior.classList.add('fade-in');
+        });
+
+        btnGezRight.addEventListener('click', () => {
+            sceneInterior.classList.remove('fade-in'); 
+            sceneHobbies.classList.remove('fade-out');
+            sceneInterior.classList.add('fade-out');
+            sceneHobbies.classList.add('fade-in');
+        });
+
+        btnBackToInteriorFromHobi.addEventListener('click', () => {
+            sceneHobbies.classList.remove('fade-in');
+            sceneInterior.classList.remove('fade-out');
+            sceneHobbies.classList.add('fade-out');
+            sceneInterior.classList.add('fade-in');
+        });
+
+        btnToHobbies2.addEventListener('click', () => {
+            sceneHobbies.classList.remove('fade-in');
+            sceneHobbies2.classList.remove('fade-out');
+            sceneHobbies.classList.add('fade-out');
+            sceneHobbies2.classList.add('fade-in');
+        });
+
+        btnBackToHobbies1.addEventListener('click', () => {
+            sceneHobbies2.classList.remove('fade-in');
+            sceneHobbies.classList.remove('fade-out');
+            sceneHobbies2.classList.add('fade-out');
+            sceneHobbies.classList.add('fade-in');
+        });
+
+        btnBackToInteriorFromHobi2.addEventListener('click', () => {
+            sceneHobbies2.classList.remove('fade-in');
+            sceneInterior.classList.remove('fade-out');
+            sceneHobbies2.classList.add('fade-out');
+            sceneInterior.classList.add('fade-in');
+        });
+
+        btnGezCenter.addEventListener('click', () => {
+            sceneInterior.classList.remove('fade-in'); 
+            sceneExit.classList.remove('fade-out');
+            sceneInterior.classList.add('fade-out');
+            sceneExit.classList.add('fade-in');
+        });
+
+        btnBackToInteriorFromExit.addEventListener('click', () => {
+            sceneExit.classList.remove('fade-in');
+            sceneInterior.classList.remove('fade-out');
+            sceneExit.classList.add('fade-out');
+            sceneInterior.classList.add('fade-in');
+        });
+
+        btnFinalExit.addEventListener('click', () => {
+            sceneExit.classList.remove('fade-in');
+            sceneFinal.classList.remove('fade-out');
+            sceneExit.classList.add('fade-out');
+            sceneFinal.classList.add('fade-in');
+        });
+
+        btnBackToExitFromFinal.addEventListener('click', () => {
+            sceneFinal.classList.remove('fade-in');
+            sceneExit.classList.remove('fade-out');
+            sceneFinal.classList.add('fade-out');
+            sceneExit.classList.add('fade-in');
+        });
+
+        // ==========================================
+        // KAĞIT (MODAL) SÜRÜKLEME VE AÇMA İŞLEMLERİ
+        // ==========================================
+        const okuButtons = document.querySelectorAll('.oku-btn');
+        const paperModalOverlay = document.getElementById('paperModalOverlay');
+        const bigPaper = document.getElementById('bigPaper');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalText = document.getElementById('modalText');
+        const modalLocation = document.getElementById('modalLocation');
+
+        let isPaperDragging = false;
+        let paperPreviousMousePosition = { x: 0, y: 0 };
+        let paperRotation = { x: 0, y: 0 };
+        let paperMousedownCoords = { x: 0, y: 0 };
+        let paperLastClickDistance = 0;
+        
+        let isExitLetterRead = false; 
+
+        okuButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (btn.getAttribute('data-layout') === 'vertical') {
+                    bigPaper.classList.add('vertical');
+                } else {
+                    bigPaper.classList.remove('vertical');
+                }
+
+                if (btn.id === 'btn-oku-exit') {
+                    isExitLetterRead = true;
+                }
+
+                modalTitle.innerText = btn.getAttribute('data-title');
+                modalText.innerText = btn.getAttribute('data-text');
+                
+                const loc = btn.getAttribute('data-location');
+                if(loc) {
+                    modalLocation.innerText = loc;
+                    modalLocation.style.display = 'block';
+                } else {
+                    modalLocation.style.display = 'none';
+                }
+                
+                paperModalOverlay.classList.add('active');
+                paperRotation = { x: 0, y: 0 };
+                bigPaper.style.transform = `scale(1) rotateX(0deg) rotateY(0deg)`;
+                bigPaper.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            });
+        });
+
+        paperModalOverlay.addEventListener('mousedown', (e) => {
+            if (e.target.closest('#bigPaper')) {
+                isPaperDragging = true;
+                bigPaper.style.transition = 'none'; 
+            }
+            paperMousedownCoords = { x: e.clientX, y: e.clientY };
+            paperPreviousMousePosition = { x: e.clientX, y: e.clientY };
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isPaperDragging) return;
+            
+            const deltaMove = {
+                x: e.clientX - paperPreviousMousePosition.x,
+                y: e.clientY - paperPreviousMousePosition.y
+            };
+
+            paperRotation.y += deltaMove.x * 0.3;
+            paperRotation.x -= deltaMove.y * 0.3;
+            
+            paperRotation.x = Math.max(-45, Math.min(45, paperRotation.x));
+            paperRotation.y = Math.max(-45, Math.min(45, paperRotation.y));
+
+            bigPaper.style.transform = `scale(1) rotateX(${paperRotation.x}deg) rotateY(${paperRotation.y}deg)`;
+            paperPreviousMousePosition = { x: e.clientX, y: e.clientY };
+        });
+
+        window.addEventListener('mouseup', (e) => {
+            paperLastClickDistance = Math.hypot(e.clientX - paperMousedownCoords.x, e.clientY - paperMousedownCoords.y);
+            if (isPaperDragging) {
+                isPaperDragging = false;
+                bigPaper.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            }
+        });
+
+        function closePaperModal() {
+            paperModalOverlay.classList.remove('active');
+            
+            if (isExitLetterRead) {
+                btnFinalExit.style.opacity = '1';
+                btnFinalExit.style.pointerEvents = 'auto';
+                isExitLetterRead = false; 
+            }
+        }
+
+        paperModalOverlay.addEventListener('click', (e) => {
+            if (e.target === paperModalOverlay && paperLastClickDistance < 5) {
+                closePaperModal();
+            }
+        });
+    </script>
+
+</body>
+</html>
